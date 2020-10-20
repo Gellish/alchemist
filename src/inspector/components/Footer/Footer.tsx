@@ -30,9 +30,17 @@ export interface IFooterDispatch {
 export type TFooter = IFooterProps & IFooterDispatch
 export type TFooterComponent = React.Component<TFooter>
 
-export class Footer extends React.Component<TFooter> { 
+interface IState{
+	defaultOption: number
+}
+
+export class Footer extends React.Component<TFooter,IState> { 
 	constructor(props: TFooter) {
 		super(props);
+
+		this.state = {
+			defaultOption: 0,
+		};
 	}
 
 	private exportState = () => {
@@ -56,35 +64,73 @@ export class Footer extends React.Component<TFooter> {
 		this.props.importItems(data,kind);
 	}
 
+	private onImportMenuClick = (value: React.ChangeEvent<HTMLSelectElement>) => {
+		switch (value.target.value) {
+			case "appState": this.importState();
+				break;
+			case "addItems": this.importItems("append");
+				break;
+			case "replaceItems": this.importItems("replace");
+				break;
+		}
+		this.setState({
+			...this.state,
+			defaultOption: this.state.defaultOption +1
+		});
+	}
 
+	private onExportMenuClick = (value: React.ChangeEvent<HTMLSelectElement>) => {
+		switch (value.target.value) {
+			case "appState": this.exportState();
+				break;
+			case "allItems": this.exportItems("all");
+				break;
+			case "selectedItems": this.exportItems("selected");
+				break;
+		}
+		this.setState({
+			...this.state,
+			defaultOption: this.state.defaultOption + 1
+		});
+	}
+
+	private onClearMenuClick = (value: React.ChangeEvent<HTMLSelectElement>) => {
+		const { onClear, onClearView, allItems, onClearNonExistent } = this.props;
+		switch (value.target.value) {
+			case "all": onClear();
+				break;
+			case "inView": onClearView(false);
+				break;
+			case "notInView": onClearView(true);
+				break;
+			case "nonExistent":onClearNonExistent(filterNonExistent(allItems));
+				break;
+		}
+		this.setState({
+			...this.state,
+			defaultOption: this.state.defaultOption +1
+		});
+	}
 
 	public render(): React.ReactNode{
-		const { onClear, onClearView, allItems, onClearNonExistent } = this.props;
 		const psVersionSegments = GetInfo.getBuildString().split(" ");
 		const psVersionString = psVersionSegments[0] + " " + psVersionSegments[1].replace("(","");
 		return (
 			<div className="Footer">
-				{/*<div className="button" onClick={e=>location.reload()}>Reload</div>*/}
-				<ButtonMenu
-					key="clear"
-					className="abc"
-					placement={"top"}
-					items={
-						<div className="column">
-							<div className="button" onMouseDown={() => { onClear(); }}>All</div>
-							<div className="button" onMouseDown={() => { onClearView(false); }}>In view</div>
-							<div className="button" onMouseDown={() => { onClearView(true); }}>Not in view</div>
-							<div className="button" onMouseDown={() => { onClearNonExistent(filterNonExistent(allItems));}}>Non-existent</div>
-						</div>
-					}>
-					<div className="button">Clear...</div>
-				</ButtonMenu>
-				{
-					//<div className="button">Group same</div>
-				}
+				<div className="wrap">
+					<sp-dropdown class="drop" quiet="true" key={this.state.defaultOption}>
+						<sp-menu slot="options" onMouseDown={(e: React.ChangeEvent<HTMLSelectElement>) => this.onClearMenuClick(e)}>
+							<sp-menu-item value="default" style={{ display: "none" }} selected={this.state.defaultOption > -1 ? "default" : null}>Clear...</sp-menu-item>
+							<sp-menu-item value="all">All</sp-menu-item>
+							<sp-menu-item value="inView">In view</sp-menu-item>
+							<sp-menu-item value="notInView">Not in view</sp-menu-item>
+							<sp-menu-item value="nonExistent">Non-existent</sp-menu-item>
+						</sp-menu>
+					</sp-dropdown>
+				</div>
 				<div className="spread"></div>
 				<div className="versionBar">
-					<span className="version">v. {versions.plugin} {Main.devMode ? "DEV":"PROD"}</span>
+					<span className="version">v. {versions.plugin} {Main.devMode ? "DEV" : "PROD"}</span>
 					<span> / </span>
 					<span className="version">{versions.uxp}</span>
 					<span> / PS: </span>
@@ -93,32 +139,27 @@ export class Footer extends React.Component<TFooter> {
 				<div className="spread"></div>
 				<div className="copy">Copyright © 2020 <a href="https://bereza.cz">Bereza.cz</a></div>
 				<div className="spread"></div>
-				<ButtonMenu
-					key="import"
-					className="abc"
-					placement={"top"}
-					items={
-						<div className="column">
-							<div className="button" onMouseDown={this.importState}>App state</div>
-							<div className="button" onMouseDown={() => this.importItems("append")}>Add items</div>
-							<div className="button" onMouseDown={() => this.importItems("replace")}>Replace items</div>
-						</div>
-					}>
-					<div className="button">Import...</div>
-				</ButtonMenu>
-				<ButtonMenu
-					key="export"
-					className="abc"
-					placement={"top"}
-					items={
-						<div className="column">
-							<div className="button" onMouseDown={() => { this.exportState();}}>App state</div>
-							<div className="button" onMouseDown={() => this.exportItems("all")}>All items</div>
-							<div className="button" onMouseDown={() => this.exportItems("selected")}>Selected items</div>
-						</div>
-					}>
-					<div className="button">Export...</div>
-				</ButtonMenu>
+				<div className="wrap">
+					<sp-dropdown class="drop" quiet="true" key={this.state.defaultOption}>
+						<sp-menu slot="options" onMouseDown={(e: React.ChangeEvent<HTMLSelectElement>) => this.onImportMenuClick(e)}>
+							<sp-menu-item value="default" style={{ display: "none" }} selected={this.state.defaultOption > -1 ? "default" : null}>Import...</sp-menu-item>
+							<sp-menu-item value="appState">App state</sp-menu-item>
+							<sp-menu-item value="addItems">Add items</sp-menu-item>
+							<sp-menu-item value="replaceItems">Replace items</sp-menu-item>							
+						</sp-menu>
+					</sp-dropdown>
+				</div>
+
+				<div className="wrap">
+					<sp-dropdown class="drop" quiet="true" key={this.state.defaultOption}>
+						<sp-menu slot="options" onMouseDown={(e: React.ChangeEvent<HTMLSelectElement>) => this.onExportMenuClick(e)}>
+							<sp-menu-item value="default" style={{ display: "none" }} selected={this.state.defaultOption > -1 ? "default" : null}>Export...</sp-menu-item>
+							<sp-menu-item value="appState">App state</sp-menu-item>
+							<sp-menu-item value="allItems">All items</sp-menu-item>
+							<sp-menu-item value="selectedItems">Selected items</sp-menu-item>							
+						</sp-menu>
+					</sp-dropdown>
+				</div>
 			</div>
 		);
 	}

@@ -10,4 +10,39 @@
 	.copy,.versionBar{
 		margin:0.5em 1em;
 	}
+
+
+	//////// hack
+
+	.drop{
+		position: absolute;
+		width:9.5em;
+	}
+	
+	.wrap{
+		position: relative;
+		display:inline-flex;
+		align-items:center;
+		overflow: hidden;
+		width:5.5em;
+		height:2em;
+
+		align-items: center;
+		padding:0.3em 0.5em;
+		margin:0.3em;
+		border:1px solid gray;
+		cursor: pointer;
+		border-radius: 3px;
+		box-sizing: border-box;
+
+		&:hover{
+			color:var(--hover);
+			fill:var(--hover);
+			border:1px solid var(--hover);
+		}
+	}
+
+	.aaa{
+		display: none;
+	}
 }
