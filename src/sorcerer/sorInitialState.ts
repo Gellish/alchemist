@@ -13,7 +13,9 @@ export function getSorInitialState(): ISorcererState {
 			id: "ChangeThisID",
 			main: "index.html",
 			requiredPermissions: {
-				launchProcess: "request",
+				launchProcess: {
+					"request": true,
+				},
 			},
 			entrypoints: [
 				makeSorCommand(),
