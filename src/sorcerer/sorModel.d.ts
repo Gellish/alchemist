@@ -57,7 +57,9 @@ export interface INetwork {
 
 export interface IRequiredPermissions {
 	clipboard?: "read" | "readAndWrite"
-	launchProcess?: "any" | "none" | "request"
+	launchProcess?: {
+		request?: boolean
+	}
 	allowCodeGenerationFromStrings?: boolean
 	fonts?: "readInstalled"
 	localFileSystem?:
@@ -169,9 +171,11 @@ export interface IIcon {
 //		## Launching processes
 //		In order to have the ability to launch external processes, you must declare the capability in your manifest. The default is `none`. Use of `any` is prohibited in marketplace-distributed plugins.
 //
-//		"requiredPermissions": {
-//		    "launchProcess": "any" | "none" | "request"
-//		}
+//		requiredPermissions: {
+//				launchProcess: {
+//					"request": true,
+//				},
+//			},
 //
 //		## Viewing Font Information
 //		_Not currently enabled_

@@ -1,5 +1,9 @@
 # Changelog
 
+
+## 2.7.1
+- fix latest version photoshop 26.6 "requiredPermissions": {"launchProcess": "request"},
+
 ## 2.7.0
 
 - adds option to convert `_path` into tokens by default in generated code
